@@ -1,5 +1,4 @@
 import { ApplicationIntegrationType, ChatInputCommandInteraction, Client, InteractionContextType, MessageFlags, SlashCommandBuilder } from 'discord.js';
-import { config } from '../config';
 import { syncName } from '../utils';
 
 export default {
@@ -19,7 +18,7 @@ export default {
     await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
     const id = interaction.options.getInteger('id');
 
-    const guild = await interaction.client.guilds.fetch(config.DISCORD_GUILD_ID!);
+    const guild = await interaction.client.guilds.fetch(process.env.DISCORD_GUILD_ID);
 
     if (!guild) {
       return interaction.editReply('An error has occurred. Please try again later.');

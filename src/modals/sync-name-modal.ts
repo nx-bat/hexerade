@@ -1,5 +1,4 @@
 import { Client, ModalSubmitInteraction } from 'discord.js';
-import { config } from '../config';
 import { deferInteraction, syncName } from '../utils';
 
 export default {
@@ -17,7 +16,7 @@ export default {
       return interaction.editReply('An error has occurred. Please try again later.');
     }
 
-    const guild = await interaction.client.guilds.fetch(config.DISCORD_GUILD_ID!);
+    const guild = await interaction.client.guilds.fetch(process.env.DISCORD_GUILD_ID);
 
     if (!guild) {
       return interaction.editReply('An error has occurred. Please try again later.');

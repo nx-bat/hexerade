@@ -1,7 +1,6 @@
 import { Client } from 'discord.js';
 import { serve } from '@hono/node-server';
 import { Hono } from 'hono';
-import { config } from '../config';
 import routes from './routes';
 
 export function initializeWebserver(client: Client) {
@@ -11,7 +10,7 @@ export function initializeWebserver(client: Client) {
 
   const server = serve({
     fetch: app.fetch,
-    port: config.PORT
+    port: process.env.PORT
   }, (info) => {
     console.log(`Listening on port ${info.port}`);
   });

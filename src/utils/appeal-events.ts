@@ -1,5 +1,4 @@
 import { ActionRowBuilder, APIEmbedField, ButtonBuilder, ButtonStyle, Client, DiscordAPIError, EmbedBuilder, Message } from 'discord.js';
-import { config } from '../config';
 import { Database } from '../shared/Database';
 import { Appeal, AppealUpdate, E621Post, PostFlag } from '../types';
 import { getE621Post, getE621PostFlag, PostAction, spoilerOrBlacklist } from './e621-utils';
@@ -17,7 +16,7 @@ export async function appealUpdateHandler(client: Client, update: string) {
 }
 
 async function postAppeal(client: Client, data: AppealUpdate) {
-  const guildSettings = await Database.getOrCreateSettings(config.DISCORD_GUILD_ID!);
+  const guildSettings = await Database.getOrCreateSettings(process.env.DISCORD_GUILD_ID);
 
   if (!guildSettings || !guildSettings.appeals_channel_id) return;
 
@@ -40,7 +39,7 @@ async function postAppeal(client: Client, data: AppealUpdate) {
 }
 
 async function updateAppeal(client: Client, data: AppealUpdate) {
-  const guildSettings = await Database.getOrCreateSettings(config.DISCORD_GUILD_ID!);
+  const guildSettings = await Database.getOrCreateSettings(process.env.DISCORD_GUILD_ID);
 
   if (!guildSettings || !guildSettings.appeals_channel_id) return;
 
@@ -63,7 +62,7 @@ async function updateAppeal(client: Client, data: AppealUpdate) {
     }
   }
 
-  if (!message || message.author.id != config.DISCORD_CLIENT_ID) return postAppeal(client, data);
+  if (!message || message.author.id != process.env.DISCORD_CLIENT_ID) return postAppeal(client, data);
 
   const flag = await getE621PostFlag(data.appeal.target_id);
   const post = await getE621Post(flag!.post_id);
@@ -84,7 +83,7 @@ function getTitle(appeal: Appeal): string {
 }
 
 function getURL(appeal: Appeal): string {
-  return `${config.E621_BASE_URL}/appeals/${appeal.id}`;
+  return `${process.env.E621_BASE_URL}/appeals/${appeal.id}`;
 }
 
 async function getCustomFields(appeal: Appeal, flag: PostFlag, post: E621Post): Promise<APIEmbedField[]> {
@@ -122,7 +121,7 @@ async function getButtons(appeal: Appeal, flag: PostFlag, post: E621Post): Promi
     const button = new ButtonBuilder()
       .setLabel('Open Post')
       .setStyle(ButtonStyle.Link)
-      .setURL(`${config.E621_BASE_URL}/posts/${post.id}`);
+      .setURL(`${process.env.E621_BASE_URL}/posts/${post.id}`);
 
     row.addComponents(button);
   }

@@ -1,5 +1,4 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, Client, DiscordAPIError, EmbedBuilder, Message, SendableChannels } from 'discord.js';
-import { config } from '../config';
 import { Database } from '../shared/Database';
 import { Ticket, TicketPhrase, TicketUpdate } from '../types';
 import { PostAction, getE621Post, getE621User, spoilerOrBlacklist } from './e621-utils';
@@ -18,7 +17,7 @@ export async function ticketUpdateHandler(client: Client, update: string) {
 }
 
 async function postTicket(client: Client, data: TicketUpdate) {
-  const guildSettings = await Database.getOrCreateSettings(config.DISCORD_GUILD_ID!);
+  const guildSettings = await Database.getOrCreateSettings(process.env.DISCORD_GUILD_ID);
 
   if (!guildSettings || !guildSettings.tickets_channel_id) return;
 
@@ -40,7 +39,7 @@ async function postTicket(client: Client, data: TicketUpdate) {
 }
 
 async function updateTicket(client: Client, data: TicketUpdate) {
-  const guildSettings = await Database.getOrCreateSettings(config.DISCORD_GUILD_ID!);
+  const guildSettings = await Database.getOrCreateSettings(process.env.DISCORD_GUILD_ID);
 
   if (!guildSettings || !guildSettings.tickets_channel_id) return;
 
@@ -63,7 +62,7 @@ async function updateTicket(client: Client, data: TicketUpdate) {
     }
   }
 
-  if (!message || message.author.id != config.DISCORD_CLIENT_ID) return postTicket(client, data);
+  if (!message || message.author.id != process.env.DISCORD_CLIENT_ID) return postTicket(client, data);
 
   const embed = await createEmbedFromTicket(data.ticket);
 
@@ -100,7 +99,7 @@ function getTitle(ticket: Ticket): string {
 }
 
 function getURL(ticket: Ticket): string {
-  return `${config.E621_BASE_URL}/tickets/${ticket.id}`;
+  return `${process.env.E621_BASE_URL}/tickets/${ticket.id}`;
 }
 
 async function createEmbedFromTicket(ticket: Ticket): Promise<EmbedBuilder> {
@@ -131,23 +130,23 @@ async function getButtons(ticket: Ticket): Promise<ActionRowBuilder<ButtonBuilde
   if (ticket.category == 'blip') {
     primaryButton
       .setLabel('Open Blip')
-      .setURL(`${config.E621_BASE_URL}/blips/${ticket.target_id}`);
+      .setURL(`${process.env.E621_BASE_URL}/blips/${ticket.target_id}`);
   } else if (ticket.category == 'comment') {
     primaryButton
       .setLabel('Open Comment')
-      .setURL(`${config.E621_BASE_URL}/comments/${ticket.target_id}`);
+      .setURL(`${process.env.E621_BASE_URL}/comments/${ticket.target_id}`);
   } else if (ticket.category == 'dmail') {
     primaryButton
       .setLabel('Open DMail')
-      .setURL(`${config.E621_BASE_URL}/dmails/${ticket.target_id}`);
+      .setURL(`${process.env.E621_BASE_URL}/dmails/${ticket.target_id}`);
   } else if (ticket.category == 'forum') {
     primaryButton
       .setLabel('Open Forum Post')
-      .setURL(`${config.E621_BASE_URL}/forum_posts/${ticket.target_id}`);
+      .setURL(`${process.env.E621_BASE_URL}/forum_posts/${ticket.target_id}`);
   } else if (ticket.category == 'pool') {
     primaryButton
       .setLabel('Open Pool')
-      .setURL(`${config.E621_BASE_URL}/pools/${ticket.target_id}`);
+      .setURL(`${process.env.E621_BASE_URL}/pools/${ticket.target_id}`);
   } else if (ticket.category == 'post') {
     const post = await getE621Post(ticket.target_id);
 
@@ -155,24 +154,24 @@ async function getButtons(ticket: Ticket): Promise<ActionRowBuilder<ButtonBuilde
     else {
       primaryButton
         .setLabel('Open Post')
-        .setURL(`${config.E621_BASE_URL}/posts/${ticket.target_id}`);
+        .setURL(`${process.env.E621_BASE_URL}/posts/${ticket.target_id}`);
     }
   } else if (ticket.category == 'set') {
     primaryButton
       .setLabel('Open Set')
-      .setURL(`${config.E621_BASE_URL}/post_sets/${ticket.target_id}`);
+      .setURL(`${process.env.E621_BASE_URL}/post_sets/${ticket.target_id}`);
   } else if (ticket.category == 'user') {
     primaryButton
       .setLabel('Open User')
-      .setURL(`${config.E621_BASE_URL}/users/${ticket.target_id}`);
+      .setURL(`${process.env.E621_BASE_URL}/users/${ticket.target_id}`);
   } else if (ticket.category == 'wiki') {
     primaryButton
       .setLabel('Open Wiki')
-      .setURL(`${config.E621_BASE_URL}/wikis/${ticket.target_id}`);
+      .setURL(`${process.env.E621_BASE_URL}/wikis/${ticket.target_id}`);
   } else if (ticket.category == 'replacement') {
     primaryButton
       .setLabel('Open Replacement')
-      .setURL(`${config.E621_BASE_URL}/post_replacements?search[id]=${ticket.target_id}`);
+      .setURL(`${process.env.E621_BASE_URL}/post_replacements?search[id]=${ticket.target_id}`);
   } else {
     console.error('Unknown ticket type:');
     console.error(JSON.stringify(ticket, null, 2));
@@ -185,7 +184,7 @@ async function getButtons(ticket: Ticket): Promise<ActionRowBuilder<ButtonBuilde
     const button = new ButtonBuilder()
       .setLabel('Open Target User')
       .setStyle(ButtonStyle.Link)
-      .setURL(`${config.E621_BASE_URL}/users/${ticket.accused_id}`);
+      .setURL(`${process.env.E621_BASE_URL}/users/${ticket.accused_id}`);
 
     row.addComponents(button);
   } else if (ticket.category == 'post') {
@@ -195,7 +194,7 @@ async function getButtons(ticket: Ticket): Promise<ActionRowBuilder<ButtonBuilde
       const button = new ButtonBuilder()
         .setLabel('Open Target User')
         .setStyle(ButtonStyle.Link)
-        .setURL(`${config.E621_BASE_URL}/users/${user.id}`);
+        .setURL(`${process.env.E621_BASE_URL}/users/${user.id}`);
 
       row.addComponents(button);
     }
@@ -205,7 +204,7 @@ async function getButtons(ticket: Ticket): Promise<ActionRowBuilder<ButtonBuilde
 }
 
 async function sendTicketAlerts(ticket: Ticket, channel: SendableChannels) {
-  const guildSettings = await Database.getOrCreateSettings(config.DISCORD_GUILD_ID!);
+  const guildSettings = await Database.getOrCreateSettings(process.env.DISCORD_GUILD_ID);
 
   if (!guildSettings || !guildSettings.admin_role_id) return;
 

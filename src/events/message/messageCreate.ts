@@ -1,8 +1,7 @@
 import { Client } from 'discord.js';
-import { config } from '../../config';
 import { Database } from '../../shared/Database';
 import { Event } from '../../types';
-import { ALLOWED_MIMETYPES, blacklistIfNecessary, calculateMD5FromURL, getE621PostByMd5, getPostUrl, md5Regex, Message, regexTesters, uniqueRegexMatches } from '../../utils';
+import { ALLOWED_MIMETYPES, blacklistIfNecessary, calculateMD5FromURL, getE621PostByMd5, getPostUrl, IsProduction, md5Regex, Message, regexTesters, uniqueRegexMatches } from '../../utils';
 
 class MessageCreateEvent implements Event<Client, 'messageCreate'> {
   event = 'messageCreate' as const;
@@ -14,7 +13,7 @@ class MessageCreateEvent implements Event<Client, 'messageCreate'> {
     const responses: string[] = [];
 
     for (const test of regexTesters) {
-      if (config.DEV_MODE && !test.runInDev) continue;
+      if (!IsProduction() && !test.runInDev) continue;
 
       const hasMatches = test.regex.test(message.content);
       test.regex.lastIndex = 0;

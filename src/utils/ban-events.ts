@@ -1,7 +1,6 @@
 import { Client } from 'discord.js';
 import { BanUpdate } from '../types';
 import { Database } from '../shared/Database';
-import { config } from '../config';
 
 export async function banUpdateHandler(client: Client, update: string) {
   const data: BanUpdate = JSON.parse(update);
@@ -15,7 +14,7 @@ export async function banUpdateHandler(client: Client, update: string) {
 }
 
 async function kickDiscordAccounts(client: Client, data: BanUpdate) {
-  const guild = await client.guilds.fetch(config.DISCORD_GUILD_ID!);
+  const guild = await client.guilds.fetch(process.env.DISCORD_GUILD_ID);
 
   const discordIds = await Database.getDiscordIds(data.ban.user_id);
 

@@ -1,7 +1,6 @@
 import { Client, RESTPostAPIApplicationCommandsJSONBody, Routes } from 'discord.js';
 import fs from 'fs';
 import path from 'path';
-import { config } from '../config';
 import { Command } from '../types';
 
 const ROOT_DIR = path.resolve(__dirname, '..');
@@ -48,14 +47,14 @@ export async function refreshCommands(client: Client) {
 
     console.log('Global commands: ' + commands.length);
     await client.rest.put(
-      Routes.applicationCommands(config.DISCORD_CLIENT_ID!),
+      Routes.applicationCommands(process.env.DISCORD_CLIENT_ID),
       { body: commands }
     );
 
     for (const guild in guildCommands) {
       console.log('Guild commands: ' + guildCommands[guild].length + ' (' + guild + ')');
       await client.rest.put(
-        Routes.applicationGuildCommands(config.DISCORD_CLIENT_ID!, guild),
+        Routes.applicationGuildCommands(process.env.DISCORD_CLIENT_ID, guild),
         { body: guildCommands[guild] }
       );
     }

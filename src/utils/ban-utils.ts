@@ -1,9 +1,8 @@
 import { Client } from 'discord.js';
 import { Database } from '../shared/Database';
-import { config } from '../config';
 
 export async function checkExpiredBans(client: Client) {
-  const guild = await client.guilds.fetch(config.DISCORD_GUILD_ID!);
+  const guild = await client.guilds.fetch(process.env.DISCORD_GUILD_ID);
 
   if (!guild) return;
 

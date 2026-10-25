@@ -1,8 +1,7 @@
 import { Client, PartialMessage } from 'discord.js';
-import { config } from '../../config';
 import { Database } from '../../shared/Database';
 import { Event } from '../../types';
-import { isEdited, logEdit, Message, regexTesters, uniqueRegexMatches } from '../../utils';
+import { isEdited, IsProduction, logEdit, Message, regexTesters, uniqueRegexMatches } from '../../utils';
 
 class MessageUpdateEvent implements Event<Client, 'messageUpdate'> {
   event = 'messageUpdate' as const;
@@ -27,7 +26,7 @@ class MessageUpdateEvent implements Event<Client, 'messageUpdate'> {
     const responses: string[] = [];
 
     for (const test of regexTesters) {
-      if (config.DEV_MODE && !test.runInDev) continue;
+      if (!IsProduction() && !test.runInDev) continue;
 
       const hasMatches = test.regex.test(newMessage.content);
       test.regex.lastIndex = 0;

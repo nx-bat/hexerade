@@ -1,11 +1,10 @@
 import { existsSync, readFileSync } from 'fs';
-import { config } from '../config';
 import _https from 'https';
 import _http from 'http';
 import { E621Pool, E621Post, E621User, PostFlag, Record } from '../types';
 import path from 'path';
 
-const secure = config.E621_BASE_URL?.startsWith('https');
+const secure = process.env.E621_BASE_URL.startsWith('https');
 const http = secure ? _https : _http;
 
 const BLACKLISTED_TAGS: string[] = [];
@@ -29,7 +28,7 @@ if (secure && existsSync('./certs/cert.pem') && existsSync('./certs/cert.pem')) 
 }
 
 async function request(path: string, query?: { [name: string]: string }, logErrors = true): Promise<any> {
-  const url = new URL(config.E621_BASE_URL!);
+  const url = new URL(process.env.E621_BASE_URL!);
   url.pathname = path + '.json';
 
   if (query) {
@@ -128,12 +127,12 @@ export function spoilerOrBlacklist(post: E621Post): { action: PostAction, tag: s
 }
 
 export function getPostUrl(post: E621Post): string {
-  if (post.rating == 's') return `${config.E926_BASE_URL}/posts/${post.id}`;
-  return `${config.E621_BASE_URL}/posts/${post.id}`;
+  if (post.rating == 's') return `${process.env.E926_BASE_URL}/posts/${post.id}`;
+  return `${process.env.E621_BASE_URL}/posts/${post.id}`;
 }
 
 export function getPoolUrl(pool: E621Pool): string {
-  return `${config.E621_BASE_URL}/pools/${pool.id}`;
+  return `${process.env.E621_BASE_URL}/pools/${pool.id}`;
 }
 
 export async function userIsBanned(idOrName: string | number): Promise<boolean> {

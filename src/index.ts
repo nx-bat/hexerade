@@ -1,5 +1,6 @@
+import './config';
+
 import { Client, GatewayIntentBits, MessageFlags, Partials } from 'discord.js';
-import { config } from './config';
 import events from './events';
 import { Database } from './shared/Database';
 import { openRedisClient } from './shared/RedisClient';
@@ -8,7 +9,6 @@ import { initIfNecessary, loadHandlersFrom, refreshCommands } from './utils';
 import { initializeWebserver } from './webserver';
 import { Encrypter } from './shared/Encrypter';
 import tasks from './tasks';
-
 
 let ready = false;
 
@@ -137,9 +137,9 @@ client.on('clientReady', async () => {
   await initIfNecessary(client, modals);
   await initIfNecessary(client, menus);
 
-  Encrypter.initialize(config.DATABASE_SECRET!);
+  Encrypter.initialize(process.env.DATABASE_SECRET);
   await Database.open('./data/discord-main.db');
-  await openRedisClient(config.REDIS_URL!, client);
+  await openRedisClient(process.env.REDIS_URL, client);
 
   await initializeWebserver(client);
 
@@ -167,4 +167,4 @@ client.on('clientReady', async () => {
 client.on('error', console.error);
 process.on('uncaughtException', console.error);
 
-client.login(config.DISCORD_TOKEN);
+client.login(process.env.DISCORD_TOKEN);

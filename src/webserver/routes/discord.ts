@@ -4,12 +4,10 @@ import path from 'path';
 import { Hono, type Context } from 'hono';
 import { getCookie, setCookie, deleteCookie } from 'hono/cookie';
 import { ContentfulStatusCode } from 'hono/utils/http-status';
-
-import { config } from '../../config';
 import { Database } from '../../shared/Database';
-import { AltData, comprehensiveAltLookupFromE621, DiscordOAuth2 } from '../../utils';
+import { AltData, comprehensiveAltLookupFromE621, DiscordOAuth2, IsProduction } from '../../utils';
 
-const DEV_BASE_URL = `http://localhost:${config.PORT}`;
+const DEV_BASE_URL = `http://localhost:${process.env.PORT}`;
 const PROD_BASE_URL = 'https://discord.e621.net';
 
 const OAUTH_SCOPES = ['identify', 'guilds.join'];
@@ -29,12 +27,12 @@ interface SessionData {
 const sessions = new Map<string, SessionData>();
 
 const oauth = new DiscordOAuth2({
-  clientId: config.DISCORD_CLIENT_ID!,
-  clientSecret: config.DISCORD_CLIENT_SECRET!,
-  redirectUri: `${config.DEV_MODE ? DEV_BASE_URL : PROD_BASE_URL}/callback`,
-  clientToken: config.DISCORD_TOKEN!,
+  clientId: process.env.DISCORD_CLIENT_ID,
+  clientSecret: process.env.DISCORD_CLIENT_SECRET,
+  redirectUri: `${!IsProduction() ? DEV_BASE_URL : PROD_BASE_URL}/callback`,
+  clientToken: process.env.DISCORD_TOKEN,
   credentials: Buffer
-    .from(`${config.DISCORD_CLIENT_ID!}:${config.DISCORD_CLIENT_SECRET!}`)
+    .from(`${process.env.DISCORD_CLIENT_ID}:${process.env.DISCORD_CLIENT_SECRET}`)
     .toString('base64')
 });
 
@@ -80,8 +78,8 @@ function createSession(c: Context, data: Omit<SessionData, 'expiresAt'>): void {
 
   setCookie(c, SESSION_COOKIE, sessionId, {
     maxAge: SESSION_MAX_AGE,
-    httpOnly: !config.DEV_MODE,
-    secure: !config.DEV_MODE,
+    httpOnly: IsProduction(),
+    secure: IsProduction(),
     sameSite: 'Lax',
     path: '/'
   });
@@ -118,12 +116,12 @@ async function joinGuild(code: string, userId: string, username: string): Promis
 
     const response = await oauth.addMember({
       accessToken: tokenResponse.access_token,
-      guildId: config.DISCORD_GUILD_ID!,
+      guildId: process.env.DISCORD_GUILD_ID,
       userId: user.id,
       nickname: username
     });
 
-    if (config.DEBUG) console.log(response);
+    if (!IsProduction()) console.log(response);
 
     if (!response) return JoinResponse.Error;
   } catch (e: any) {
@@ -159,7 +157,7 @@ async function handleInitial(c: Context): Promise<Response> {
   if (Number.isNaN(timestamp) || Date.now() / 1000 > timestamp)
     return render(c, 403, 'You took too long to authorize the request. Please try again.');
 
-  const authString = `${username} ${userId} ${time} ${config.LINK_SECRET}`;
+  const authString = `${username} ${userId} ${time} ${process.env.LINK_SECRET}`;
   const digest = crypto.createHash('sha256').update(authString).digest('hex');
   if (hash !== digest) {
     console.error(`Bad auth: ${hash} ${digest}`);
@@ -219,7 +217,7 @@ async function handleCallback(c: Context): Promise<Response> {
     return sendInternalServerError(c);
   }
 
-  return render(c, 200, 'Success', `You have been added to the server. <a href="https://discord.com/channels/${config.DISCORD_GUILD_ID}">See you there.</a>`);
+  return render(c, 200, 'Success', `You have been added to the server. <a href="https://discord.com/channels/${process.env.DISCORD_GUILD_ID}">See you there.</a>`);
 }
 
 function sendInternalServerError(c: Context, message: string = ''): Response {

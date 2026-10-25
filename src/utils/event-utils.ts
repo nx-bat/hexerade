@@ -1,5 +1,4 @@
 import { APIEmbedField, EmbedAuthorOptions } from 'discord.js';
-import { config } from '../config';
 import { parseDTextToMarkdown } from './dtext-utils';
 
 const MAX_FIELD_LENGTH = 1024;
@@ -11,7 +10,7 @@ export async function parseMarkdownToField(input: string): Promise<string> {
 
 export function getAuthor(data: { user_id: number, user: string }): EmbedAuthorOptions {
   return {
-    url: `${config.E621_BASE_URL}/users/${data.user_id}`,
+    url: `${process.env.E621_BASE_URL}/users/${data.user_id}`,
     name: data.user
   };
 }

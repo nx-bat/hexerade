@@ -6,6 +6,7 @@ export * from './ban-events';
 export * from './ban-utils';
 export * from './channel-utils';
 export * from './commands';
+export * from './config-utils';
 export * from './debug-utils';
 export * from './discord-user-utils';
 export * from './dtext-utils';

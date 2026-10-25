@@ -1,5 +1,4 @@
 import { ApplicationCommandType, ApplicationIntegrationType, Client, ContextMenuCommandBuilder, InteractionContextType, ModalBuilder, PermissionFlagsBits, TextInputStyle, UserContextMenuCommandInteraction } from 'discord.js';
-import { config } from '../config';
 import { Database } from '../shared/Database';
 import { createTextInput, deferInteraction, syncName } from '../utils';
 
@@ -16,7 +15,7 @@ export default {
 
     const idToUse = interaction.targetUser.id;
 
-    const guild = await interaction.client.guilds.fetch(config.DISCORD_GUILD_ID!);
+    const guild = await interaction.client.guilds.fetch(process.env.DISCORD_GUILD_ID);
 
     if (!guild) {
       return interaction.editReply('An error has occurred. Please try again later.');

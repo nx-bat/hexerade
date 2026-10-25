@@ -1,5 +1,4 @@
 import { ApplicationIntegrationType, ChatInputCommandInteraction, Client, InteractionContextType, PermissionFlagsBits, SlashCommandBuilder } from 'discord.js';
-import { config } from '../config';
 import { deferInteraction, getDiscordAlts, getE621User } from '../utils';
 
 export default {
@@ -32,7 +31,7 @@ export default {
 
       const content = await getDiscordAlts(e621User.id, interaction.guild, 1, [e621User.id]);
 
-      interaction.editReply(`[${e621User.name}](${config.E621_BASE_URL}/users/${e621User.id})<${e621User.id}>'s e621 and discord account(s):\n${content}`);
+      interaction.editReply(`[${e621User.name}](${process.env.E621_BASE_URL}/users/${e621User.id})<${e621User.id}>'s e621 and discord account(s):\n${content}`);
     } catch (e) {
       console.error(e);
 

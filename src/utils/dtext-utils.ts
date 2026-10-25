@@ -1,11 +1,10 @@
 import { BlockNode, DocumentNode, formatMarkdown, InlineNode, LinkNode, MarkdownFormatContext, MarkdownHandlers, markdownHandlers, parseDTextToAST, SpoilerBlockNode, TableBodyNode, TableHeadNode, TableLiteralNode, TableRowNode, TextNode } from '@clynamic/dmark';
-import { config } from '../config';
 import { E621Post } from '../types';
 import { getManyE621Posts, PostAction, SEARCH_LIMIT, spoilerOrBlacklist } from './e621-utils';
 
 export async function parseDTextToMarkdown(text: string): Promise<string> {
   const ast = parseDTextToAST(text, {
-    baseUrl: config.E621_BASE_URL,
+    baseUrl: process.env.E621_BASE_URL,
     allowColor: false
   }) as DocumentNode;
 
@@ -60,10 +59,10 @@ export async function parseDTextToMarkdown(text: string): Promise<string> {
           out.push('[');
           out.push('post #', node.id!);
           out.push(']');
-          out.push(`(${node.href.startsWith('/') ? config.E621_BASE_URL : ''}${node.href})`);
+          out.push(`(${node.href.startsWith('/') ? process.env.E621_BASE_URL : ''}${node.href})`);
         }
       } else if (node.linkType == 'url') {
-        out.push(`${node.href.startsWith('/') ? config.E621_BASE_URL : ''}${node.href}`);
+        out.push(`${node.href.startsWith('/') ? process.env.E621_BASE_URL : ''}${node.href}`);
       } else if (node.linkType == 'inline') {
         out.push('[');
         if (node.children) {
@@ -74,12 +73,12 @@ export async function parseDTextToMarkdown(text: string): Promise<string> {
           out.push('-NO TITLE-');
         }
         out.push(']');
-        out.push(`(${node.href.startsWith('/') ? config.E621_BASE_URL : ''}${node.href})`);
+        out.push(`(${node.href.startsWith('/') ? process.env.E621_BASE_URL : ''}${node.href})`);
       } else {
         out.push('[');
         markdownHandlers.link(node, out, ctx);
         out.push(']');
-        out.push(`(${node.href.startsWith('/') ? config.E621_BASE_URL : ''}${node.href})`);
+        out.push(`(${node.href.startsWith('/') ? process.env.E621_BASE_URL : ''}${node.href})`);
       }
     }
   };
@@ -119,5 +118,5 @@ function formatWikiLink(node: LinkNode, out: string[]): void {
       ? (node.children[0] as TextNode).content
       : '';
 
-  out.push('[', '[[', childText, ']]', ']', `(${config.E621_BASE_URL}${node.href})`);
+  out.push('[', '[[', childText, ']]', ']', `(${process.env.E621_BASE_URL}${node.href})`);
 }

@@ -2,7 +2,6 @@ import crypto from 'crypto';
 import { Client } from 'discord.js';
 import { Hono, type Context } from 'hono';
 
-import { config } from '../../config';
 import { Database } from '../../shared/Database';
 import { fixPings, logDebug, removeIssueLinks  } from '../../utils';
 
@@ -30,7 +29,7 @@ async function handleGithubRelease(client: Client, c: Context): Promise<Response
     return c.body(null, 401);
   }
 
-  const computedSignature = crypto.createHmac('sha256', config.RELEASE_SECRET!)
+  const computedSignature = crypto.createHmac('sha256', process.env.RELEASE_SECRET)
     .update(Buffer.from(rawBody)).digest('hex');
 
   // Use timingSafeEqual rather than a normal string comparison for the HMAC.
@@ -54,7 +53,7 @@ async function processGithubRelease(client: Client, rawBody: Buffer): Promise<vo
 
     if (data.action !== 'published' || data.repository.id !== GITHUB_REPO_ID) return;
 
-    const settings = await Database.getOrCreateSettings(config.DISCORD_GUILD_ID!);
+    const settings = await Database.getOrCreateSettings(process.env.DISCORD_GUILD_ID);
     if (!settings.github_release_channel) return;
 
     const channel = await client.channels.fetch(settings.github_release_channel);

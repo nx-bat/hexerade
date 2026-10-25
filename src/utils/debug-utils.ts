@@ -1,5 +1,5 @@
-import { config } from '../config';
+import { IsProduction } from '.';
 
 export function logDebug(message: string) {
-  if (config.DEBUG) console.log(`[DEBUG] ${message}`);
+  if (!IsProduction()) console.log(`[DEBUG] ${message}`);
 }

@@ -1,5 +1,4 @@
 import { Message as DiscordMessage, GuildBasedChannel, GuildTextBasedChannel, spoiler, OmitPartialGroupDMChannel } from 'discord.js';
-import { config } from '../config';
 import { appealIDRegex, artistIDRegex, blipIDRegex, channelIgnoresLinks, channelIsInStaffCategory, channelIsSafe, commentIDRegex, flagIDRegex, forumTopicIDRegex, getE621Pool, getE621Post, getE621PostByMd5, getManyE621Posts, getPoolUrl, getPostUrl, isInSpoilerTags, issueRegex, poolIDRegex, PostAction, postIDRegex, prRegex, recordIDRegex, searchLinkRegex, setIDRegex, spoilerOrBlacklist, takedownIDRegex, ticketIDRegex, userIDRegex, wikiLinkRegex } from '.';
 import { E621Post, E621Pool } from '../types';
 
@@ -58,7 +57,7 @@ async function searchHandler(message: Message, matchedGroups: RegExpExecArray[])
   let content = '';
 
   for (const group of matchedGroups) {
-    content += `<${config.E621_BASE_URL}/posts?tags=${encodeURIComponent(group[1])}>\n`;
+    content += `<${process.env.E621_BASE_URL}/posts?tags=${encodeURIComponent(group[1])}>\n`;
   }
 
   if (content.trim().length > 0) return content.trim();
@@ -74,7 +73,7 @@ async function wikiPageHandler(message: Message, matchedGroups: RegExpExecArray[
   let content = '';
 
   for (const group of matchedGroups) {
-    content += `<${config.E621_BASE_URL}/wiki_pages/${group[1].split('#').map(t => encodeURIComponent(t)).join('#')}>\n`;
+    content += `<${process.env.E621_BASE_URL}/wiki_pages/${group[1].split('#').map(t => encodeURIComponent(t)).join('#')}>\n`;
   }
 
   if (content.trim().length > 0) return content.trim();
@@ -200,7 +199,7 @@ async function idHandler(path: string, message: Message, matchedGroups: RegExpEx
 
   if (skip) return true;
 
-  const content = matchedGroups.map(m => `${config.E621_BASE_URL}/${path}/${m[1]}`).join('\n');
+  const content = matchedGroups.map(m => `${process.env.E621_BASE_URL}/${path}/${m[1]}`).join('\n');
 
   if (content.trim().length > 0) return content.trim();
 
@@ -289,7 +288,7 @@ async function githubPullRequestHandler(message: Message, matchedGroups: RegExpE
   let content = '';
 
   for (const group of matchedGroups) {
-    content += `${config.GIT_REPO_BASE_URL}/pull/${group[1]}\n`;
+    content += `${process.env.GIT_REPO_BASE_URL}/pull/${group[1]}\n`;
   }
 
   if (content.trim().length > 0) return content.trim();
@@ -305,7 +304,7 @@ async function githubIssueHandler(message: Message, matchedGroups: RegExpExecArr
   let content = '';
 
   for (const group of matchedGroups) {
-    content += `${config.GIT_REPO_BASE_URL}/issues/${group[1]}\n`;
+    content += `${process.env.GIT_REPO_BASE_URL}/issues/${group[1]}\n`;
   }
 
   if (content.trim().length > 0) return content.trim();

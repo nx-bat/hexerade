@@ -1,5 +1,4 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Guild } from 'discord.js';
-import { config } from '../config';
 import { E621User, MessageContent, Record, RecordCategory } from '../types';
 import { comprehensiveAltLookupFromDiscord, e621IdsFromAltData } from './alt-utils';
 import { getE621User, getUserRecords } from './e621-utils';
@@ -94,10 +93,10 @@ function getRecordEmbed(record: RecordWithUserData): EmbedBuilder {
     .setColor(getRecordColor(record.category))
     .setTitle(`Record from ${record.creator.name} for ${record.user.name}`)
     .setDescription(record.body.trim())
-    .setURL(`${config.E621_BASE_URL}/user_feedbacks/${record.id}`)
+    .setURL(`${process.env.E621_BASE_URL}/user_feedbacks/${record.id}`)
     .setAuthor({
       name: `${isUpdated ? 'Last updated by' : 'Created by'}: ${creator.name}`,
-      url: `${config.E621_BASE_URL}/users/${creator.id}`
+      url: `${process.env.E621_BASE_URL}/users/${creator.id}`
     })
     .setTimestamp(new Date(record.updated_at));
 }

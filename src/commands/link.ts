@@ -1,5 +1,4 @@
 import { ApplicationIntegrationType, ChatInputCommandInteraction, Client, InteractionContextType, MessageFlags, PermissionFlagsBits, SlashCommandBuilder } from 'discord.js';
-import { config } from '../config';
 import { Database } from '../shared/Database';
 import { getIdFromInput, logCustomEvent, resolveUser } from '../utils';
 
@@ -85,7 +84,7 @@ export default {
           },
           {
             name: 'E621 User',
-            value: `${config.E621_BASE_URL}/users/${e621Id}`,
+            value: `${process.env.E621_BASE_URL}/users/${e621Id}`,
             inline: true
           }
         ]
@@ -117,7 +116,7 @@ export default {
           },
           {
             name: 'E621 User',
-            value: `${config.E621_BASE_URL}/users/${e621Id}`,
+            value: `${process.env.E621_BASE_URL}/users/${e621Id}`,
             inline: true
           }
         ]
