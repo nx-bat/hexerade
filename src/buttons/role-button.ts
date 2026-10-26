@@ -1,5 +1,6 @@
 import { ButtonInteraction, Client, MessageFlags } from 'discord.js';
 import { Database } from '../shared/Database';
+import { logging } from '../utils';
 
 export default {
   name: 'role-button',
@@ -25,7 +26,7 @@ export default {
       }
 
     } catch (e) {
-      console.error(e);
+      logging.error('BUTTONS >> RoleButton', e);
       interaction.editReply({ content: 'Could not add role. Is it higher than mine?' });
     }
   }

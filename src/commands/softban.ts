@@ -1,5 +1,5 @@
 import { ApplicationIntegrationType, ChatInputCommandInteraction, Client, GuildMember, InteractionContextType, PermissionFlagsBits, SlashCommandBuilder } from 'discord.js';
-import { deferInteraction } from '../utils';
+import { deferInteraction, logging } from '../utils';
 
 export default {
   name: 'softban',
@@ -65,14 +65,14 @@ export default {
         deleteMessageSeconds: seconds
       });
     } catch (e) {
-      console.error(e);
+      logging.error('COMMANDS >> /softban', e);
       return await interaction.editReply("Error softbanning user (couldn't ban).");
     }
 
     try {
       await interaction.guild.bans.remove(user, 'User was softbanned.');
     } catch (e) {
-      console.error(e);
+      logging.error('COMMANDS >> /softban', e);
       return await interaction.editReply("Error softbanning user (couldn't remove ban).");
     }
 

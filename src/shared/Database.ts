@@ -3,7 +3,7 @@ import path from 'path';
 import { open, Database as SqliteDatabase } from 'sqlite';
 import sqlite3 from 'sqlite3';
 import { AppealMessage, Ban, GithubUserMapping, GuildArraySetting, GuildSettings, KnowledgebaseItem, LoggedMessage, Note, PrivateHelpTicket, RoleButton, TicketMessage, TicketPhrase } from '../types';
-import { deserializeMessage, Message, serializeMessage, wait } from '../utils';
+import { deserializeMessage, logging, Message, serializeMessage, wait } from '../utils';
 import { Encrypter } from './Encrypter';
 
 export const enum PrivateHelpTicketStatus {
@@ -18,14 +18,14 @@ export class Database {
   static async open(file: string): Promise<void> {
     if (Database.db) return;
 
-    console.log('Opening SQLite database');
+    logging.info('SQLITE >> open()', 'Opening SQLite database...');
 
     Database.db = await open({
       filename: file,
       driver: sqlite3.Database
     });
 
-    console.log('SQLite database opened');
+    logging.info('SQLITE >> open()', 'Opened SQLite database...');
 
     await Database.ensure();
     await Database.migrate();
@@ -34,17 +34,17 @@ export class Database {
   private static async ensure() {
     const schema = readFileSync(path.join(__dirname, '..', '..', 'sql', 'structure.sql'), { encoding: 'utf-8' });
     await Database.db.exec(schema);
-    console.log('SQLite database ensured');
+    logging.info('SQLITE >> ensure()', 'Succesfully applied database schema.');
   }
 
   private static async migrate() {
-    console.log('Starting database migrations');
+    logging.info('SQLITE >> migrate()', 'Applying SQLite migrations...');
 
     await Database.db.migrate({
       migrationsPath: path.join(__dirname, '..', '..', 'sql', 'migrations')
     });
 
-    console.log('Database migrations ran');
+    logging.info('SQLITE >> migrate()', 'Finished applying SQLite migrations.');
   }
 
   //#region WHOIS
@@ -131,7 +131,7 @@ export class Database {
 
       return true;
     } catch (e) {
-      console.error(e);
+      logging.error('SQLITE >> putMessage()', e);
       return false;
     }
   }

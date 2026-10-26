@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import { logging } from '.';
 
 const DISCORD_PNG_ADDITIONAL_BYTE_LENGTH = 26;
 const END_PNG_BYTES = 12;
@@ -48,7 +49,7 @@ export async function downloadFile(url: string): Promise<Buffer[] | null> {
 
     return [finalData, Buffer.from(data)];
   } catch (e) {
-    console.error(e);
+    logging.error('UTILS >> downloadFile()', e);
     return null;
   }
 }
@@ -65,7 +66,7 @@ export async function calculateMD5FromURL(url: string): Promise<{ correctedFileM
       originalFileMD5: calculateMD5(files[1])
     };
   } catch (e) {
-    console.error(e);
+    logging.error('UTILS >> calculateMD5FromURL()', e);
     return null;
   }
 }

@@ -1,6 +1,7 @@
 import { AuditLogChange, AuditLogEvent, Guild, GuildAuditLogsEntry, PermissionsBitField, PermissionsString, time, TimestampStyles } from 'discord.js';
 import { ApplicationCommandPermissionChangeLog, PermissionsChangeLog, PinExtras, RoleChangeLog, TimeoutChangeLog } from '../types';
 import { getArrayDifference } from './array-utils';
+import { logging } from '.';
 
 export const enum TargetType {
   Unknown = 0,
@@ -86,7 +87,7 @@ export function formatExtras(entry: GuildAuditLogsEntry, guild: Guild): string {
 
     return results.join('\n');
   } catch (e) {
-    console.error(e);
+    logging.error('UTILS >> formatExtras()', e);
     return '';
   }
 

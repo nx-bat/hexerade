@@ -4,12 +4,12 @@ import { Hono, type Context } from 'hono';
 
 import { config } from '../../config';
 import { Database } from '../../shared/Database';
-import { fixPings, logDebug, removeIssueLinks  } from '../../utils';
+import { fixPings, logging, removeIssueLinks  } from '../../utils';
 
 const GITHUB_REPO_ID = 169334303;
 
 async function handleGithubRelease(client: Client, c: Context): Promise<Response> {
-  logDebug('Received github release webhook');
+  logging.debug('WEBSERVER >> handleGithubRelease()', 'Received GitHub Release webhook.');
 
   /*
     Intentionally read the raw request body here.
@@ -50,7 +50,7 @@ async function processGithubRelease(client: Client, rawBody: Buffer): Promise<vo
   try {
     const data = JSON.parse(rawBody.toString('utf-8'));
 
-    logDebug(`Release webhook data:\n${JSON.stringify(data, null, 4)}`);
+    logging.debug('WEBSERVER >> processGithubRelease()', `Release webhook data:\n${JSON.stringify(data, null, 4)}`);
 
     if (data.action !== 'published' || data.repository.id !== GITHUB_REPO_ID) return;
 
@@ -81,7 +81,7 @@ async function processGithubRelease(client: Client, rawBody: Buffer): Promise<vo
     const date = new Date();
     let message = `## [${months[date.getUTCMonth()]} ${date.getUTCDate()}, ${date.getUTCFullYear()}](<${data.release.html_url}>)\n\n${settings.site_breaker_role_id ? `<@&${settings.site_breaker_role_id}>\n` : ''}${await fixPings(removeIssueLinks(data.release.body))}`;
 
-    logDebug('Sending github release message');
+    logging.debug('WEBSERVER >> processGithubRelease()', 'Sending github release message');
 
     const MAX_MESSAGE_LENGTH = 2000;
     const ADDITIONAL_PART = '...\n\nYou may view the full changelog on github.';
@@ -103,7 +103,7 @@ async function processGithubRelease(client: Client, rawBody: Buffer): Promise<vo
       name: data.release.tag_name
     });
 
-    logDebug('Github webhook processed');
+    logging.debug('WEBSERVER >> processGithubRelease()', 'Github webhook processed');
   } catch (e) {
     console.error('Error processing Github release webhook:', e);
   }

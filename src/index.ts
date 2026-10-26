@@ -4,7 +4,7 @@ import events from './events';
 import { Database } from './shared/Database';
 import { openRedisClient } from './shared/RedisClient';
 import { Handler } from './types';
-import { initIfNecessary, loadHandlersFrom, refreshCommands } from './utils';
+import { initIfNecessary, loadHandlersFrom, logging, refreshCommands } from './utils';
 import { initializeWebserver } from './webserver';
 import { Encrypter } from './shared/Encrypter';
 import tasks from './tasks';
@@ -12,7 +12,7 @@ import tasks from './tasks';
 
 let ready = false;
 
-console.log('Starting...');
+logging.info('CLIENT', 'Initializing...');
 
 const client = new Client({
   intents: [
@@ -83,7 +83,7 @@ client.on('interactionCreate', async (interaction) => {
         if (command.autoComplete) {
           command
             .autoComplete(client, interaction)
-            .catch(e => console.error(e));
+            .catch(e => logging.error('CLIENT', e));
         }
         return;
       }
@@ -122,7 +122,7 @@ client.on('interactionCreate', async (interaction) => {
 });
 
 client.on('clientReady', async () => {
-  console.log(`Logged in as ${client.user!.tag}!`);
+  logging.info('CLIENT', `Logged in as: ${client.user!.tag}`);
 
   await loadHandlersFrom('commands', commands);
   await loadHandlersFrom('context-menus', contextMenus);
@@ -161,7 +161,7 @@ client.on('clientReady', async () => {
   );
 
   ready = true;
-  console.log('Ready');
+  logging.info('CLIENT', 'Done!');
 });
 
 client.on('error', console.error);

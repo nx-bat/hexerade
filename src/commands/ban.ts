@@ -1,6 +1,6 @@
 import { ApplicationIntegrationType, ChatInputCommandInteraction, Client, Guild, GuildMember, InteractionContextType, PermissionFlagsBits, SlashCommandBuilder, time, TimestampStyles, User } from 'discord.js';
 import { Database } from '../shared/Database';
-import { AltData, comprehensiveAltLookupFromDiscord, deferInteraction, getIdFromInput } from '../utils';
+import { AltData, comprehensiveAltLookupFromDiscord, deferInteraction, getIdFromInput, logging } from '../utils';
 
 export default {
   name: 'ban',
@@ -105,7 +105,7 @@ export default {
         deleteMessageSeconds: deleteMessageDays
       });
     } catch (e) {
-      console.error(e);
+      logging.error('COMMANDS >> /ban', e);
       return await interaction.editReply("Error banning user (couldn't ban).");
     }
 
@@ -127,7 +127,7 @@ async function removeAllAlts(altData: AltData[], guild: Guild, moderator: User, 
           await guild.members.kick(data.thisId as string, (reason + ` ${fullBan ? 'Full banned' : 'Banned'} by ${moderator.username} (${moderator.id})${duration > 0 ? `. Expires at: ${time(expiresAt, TimestampStyles.ShortDateTime)}` : ''}`).trim());
         }
       } catch (e) {
-        console.error(e);
+        logging.error('COMMANDS >> /ban', e);
       }
     }
 

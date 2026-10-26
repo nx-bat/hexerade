@@ -1,6 +1,6 @@
 import { Message as DiscordMessage, GuildBasedChannel, GuildTextBasedChannel, spoiler, OmitPartialGroupDMChannel } from 'discord.js';
 import { config } from '../config';
-import { appealIDRegex, artistIDRegex, blipIDRegex, channelIgnoresLinks, channelIsInStaffCategory, channelIsSafe, commentIDRegex, flagIDRegex, forumTopicIDRegex, getE621Pool, getE621Post, getE621PostByMd5, getManyE621Posts, getPoolUrl, getPostUrl, isInSpoilerTags, issueRegex, poolIDRegex, PostAction, postIDRegex, prRegex, recordIDRegex, searchLinkRegex, setIDRegex, spoilerOrBlacklist, takedownIDRegex, ticketIDRegex, userIDRegex, wikiLinkRegex } from '.';
+import { appealIDRegex, artistIDRegex, blipIDRegex, channelIgnoresLinks, channelIsInStaffCategory, channelIsSafe, commentIDRegex, flagIDRegex, forumTopicIDRegex, getE621Pool, getE621Post, getE621PostByMd5, getManyE621Posts, getPoolUrl, getPostUrl, isInSpoilerTags, issueRegex, logging, poolIDRegex, PostAction, postIDRegex, prRegex, recordIDRegex, searchLinkRegex, setIDRegex, spoilerOrBlacklist, takedownIDRegex, ticketIDRegex, userIDRegex, wikiLinkRegex } from '.';
 import { E621Post, E621Pool } from '../types';
 
 export type Message<InGuild extends boolean = boolean> = OmitPartialGroupDMChannel<DiscordMessage<InGuild>>;
@@ -131,7 +131,7 @@ async function postIdHandler(message: Message, matchedGroups: RegExpExecArray[])
         post
       });
     } catch (e) {
-      console.error(e);
+      logging.error('UTILS >> postIdHandler()', e);
     }
   }
 
@@ -167,7 +167,7 @@ async function poolIdHandler(message: Message, matchedGroups: RegExpExecArray[])
       const pool = await getE621Pool(match[1]);
       if (pool) pools.push(pool);
     } catch (e) {
-      console.error(e);
+      logging.error('UTILS >> poolIdHandler()', e);
     }
   }
 
@@ -177,7 +177,7 @@ async function poolIdHandler(message: Message, matchedGroups: RegExpExecArray[])
     const res = await getManyE621Posts(pools.map(p => p.post_ids[0]));
     if (res) posts.push(...res);
   } catch (e) {
-    console.error(e);
+    logging.error('UTILS >> RoleButton', e);
   }
 
   if (await blacklistIfNecessary(message, posts)) return false;
@@ -217,7 +217,7 @@ async function postHandler(transform: ((idString: string) => number) | null, mes
       const post = await getE621Post(transform ? transform(match[1]) : match[1]);
       if (post) posts.push(post);
     } catch (e) {
-      console.error(e);
+      logging.error('UTILS >> postHandler()', e);
     }
   }
 
@@ -236,7 +236,7 @@ async function imageHandler(message: Message, matchedGroups: RegExpExecArray[]):
       const post = await getE621PostByMd5(match[1], false);
       if (post) posts.push(post);
     } catch (e) {
-      console.error(e);
+      logging.error('UTILS >> imageHandler()', e);
     }
   }
 
@@ -263,7 +263,7 @@ async function poolHandler(message: Message, matchedGroups: RegExpExecArray[]) {
       const pool = await getE621Pool(match[1]);
       if (pool) pools.push(pool);
     } catch (e) {
-      console.error(e);
+      logging.error('UTILS >> poolHandler()', e);
     }
   }
 
@@ -273,7 +273,7 @@ async function poolHandler(message: Message, matchedGroups: RegExpExecArray[]) {
     const res = await getManyE621Posts(pools.map(p => p.post_ids[0]));
     if (res) posts.push(...res);
   } catch (e) {
-    console.error(e);
+    logging.error('UTILS >> poolHandler()', e);
   }
 
   if (await blacklistIfNecessary(message, posts)) return false;

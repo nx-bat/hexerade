@@ -1,5 +1,5 @@
 import { ApplicationIntegrationType, ChatInputCommandInteraction, Client, InteractionContextType, PermissionFlagsBits, RateLimitError, SlashCommandBuilder } from 'discord.js';
-import { msToHuman } from '../utils';
+import { logging, msToHuman } from '../utils';
 import { Database } from '../shared/Database';
 
 export default {
@@ -35,7 +35,7 @@ export default {
         return interaction.reply(`Name change limited. Try again in ${msToHuman(e.retryAfter)}`);
       }
 
-      console.error(e);
+      logging.error('COMMANDS >> /rename', e);
       return interaction.reply('An error has occurred.');
     }
   }

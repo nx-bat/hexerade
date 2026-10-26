@@ -7,7 +7,7 @@ import { ContentfulStatusCode } from 'hono/utils/http-status';
 
 import { config } from '../../config';
 import { Database } from '../../shared/Database';
-import { AltData, comprehensiveAltLookupFromE621, DiscordOAuth2 } from '../../utils';
+import { AltData, comprehensiveAltLookupFromE621, DiscordOAuth2, logging } from '../../utils';
 
 const DEV_BASE_URL = `http://localhost:${config.PORT}`;
 const PROD_BASE_URL = 'https://discord.e621.net';
@@ -123,8 +123,7 @@ async function joinGuild(code: string, userId: string, username: string): Promis
       nickname: username
     });
 
-    if (config.DEBUG) console.log(response);
-
+    logging.debug('WEBSERVER >> joinGuild()', response);
     if (!response) return JoinResponse.Error;
   } catch (e: any) {
     switch (e.code) {
@@ -215,7 +214,7 @@ async function handleCallback(c: Context): Promise<Response> {
         return sendForbidden(c, 'Discord account flagged as underage by discord.');
     }
   } catch (e) {
-    console.error(e);
+    logging.error('WEBSERVER >> handleCallback()', e);
     return sendInternalServerError(c);
   }
 
@@ -249,7 +248,7 @@ async function checkAltsForFullBans(altData: AltData[]): Promise<boolean> {
         const banData = await Database.getBan(data.thisId as string);
         if (banData?.full_ban) return true;
       } catch (e) {
-        console.error(e);
+        logging.error('WEBSERVER >> checkAltsForFullBans()', e);
       }
     }
 

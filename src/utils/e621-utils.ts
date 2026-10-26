@@ -4,6 +4,7 @@ import _https from 'https';
 import _http from 'http';
 import { E621Pool, E621Post, E621User, PostFlag, Record } from '../types';
 import path from 'path';
+import { logging } from '.';
 
 const secure = config.E621_BASE_URL?.startsWith('https');
 const http = secure ? _https : _http;
@@ -20,7 +21,8 @@ export const SEARCH_LIMIT = 320;
 
 let agent: _https.Agent | _http.Agent = secure ? new _https.Agent() : new _http.Agent();
 if (secure && existsSync('./certs/cert.pem') && existsSync('./certs/cert.pem')) {
-  console.log('[E621 Requester] Initializing agent with certificates.');
+  logging.info('E621 Requester', 'Initializing agent with certificates...');
+
   agent = new _https.Agent({
     cert: readFileSync(path.join(__dirname, '..', '..', 'certs', 'cert.pem'), { encoding: 'utf8' }),
     key: readFileSync(path.join(__dirname, '..', '..', 'certs', 'priv.key'), { encoding: 'utf8' }),
@@ -72,10 +74,7 @@ async function request(path: string, query?: { [name: string]: string }, logErro
         }
       });
     }).on('error', (e) => {
-      if (logErrors) {
-        console.error('[E621 Requester] Error fetching:');
-        console.error(e);
-      }
+      if (logErrors) logging.error('UTILS >> request()', `[E621 Requester] Error fetching: ${e}`);
       resolve(null);
     });
   });

@@ -3,6 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import { config } from '../config';
 import { Command } from '../types';
+import { logging } from '.';
 
 const ROOT_DIR = path.resolve(__dirname, '..');
 
@@ -44,23 +45,23 @@ export async function refreshCommands(client: Client) {
       }
     }
 
-    console.log('Started refreshing application (/) commands.');
+    logging.info('COMMANDS >> refreshCommands()', 'Refreshing (/) commands...');
 
-    console.log('Global commands: ' + commands.length);
+    logging.info('COMMANDS >> refreshCommands()', `Global Commands: ${commands.length}`);
     await client.rest.put(
       Routes.applicationCommands(config.DISCORD_CLIENT_ID!),
       { body: commands }
     );
 
     for (const guild in guildCommands) {
-      console.log('Guild commands: ' + guildCommands[guild].length + ' (' + guild + ')');
+      logging.info('COMMANDS >> refreshCommands()', `Guild Commands: ${guildCommands[guild].length} - (${guild})`);
       await client.rest.put(
         Routes.applicationGuildCommands(config.DISCORD_CLIENT_ID!, guild),
         { body: guildCommands[guild] }
       );
     }
 
-    console.log('Successfully reloaded application (/) commands.');
+    logging.info('COMMANDS >> refreshCommands()', 'Finished reloading (/) commands.');
   } catch (error: any) {
     console.error(error);
     console.error(JSON.stringify(error.requestBody, null, 4));

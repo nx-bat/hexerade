@@ -18,15 +18,34 @@ const colors: Record<LogType, string> = {
 
 const reset = '\x1b[0m';
 
-function log(type: LogType, module: string, content: string): void {
+function getTimestamp() {
+  return '[' + new Date().toISOString()
+    .replace('T', ' ')
+    .replace(/\.(\d{3})Z$/, ':$1')
+    .replace(/(\d{2}):(\d{2}):(\d{2})/, '$1-$2-$3'); // Change time colons to hyphens
+};
+
+function log(type: LogType, module: string, content: any): void {
   if (type == LogType.Debug && !config.DEBUG) return;
 
-  const timestamp = new Date().toLocaleTimeString();
-  console.log(`${colors[type]}${timestamp} [${type}] [${module}] ${content}${reset}`);
+  const message = `${colors[type]}${getTimestamp()}] [${type}] [${module}]: ${content}${reset}`;
+
+  switch (type) {
+    case LogType.Fatal:
+    case LogType.Error:
+      console.error(message);
+      break;
+    case LogType.Warn:
+      console.warn(message);
+      break;
+    default:
+      console.log(message);
+      break;
+  }
 }
 
-export const fatal = (module: string, content: string) => log(LogType.Fatal, module, content);
-export const error = (module: string, content: string) => log(LogType.Error, module, content);
-export const warn = (module: string, content: string) => log(LogType.Warn, module, content);
-export const info = (module: string, content: string) => log(LogType.Info, module, content);
-export const debug = (module: string, content: string) => log(LogType.Debug, module, content);
+export const fatal = (module: string, content: any) => log(LogType.Fatal, module, content);
+export const error = (module: string, content: any) => log(LogType.Error, module, content);
+export const warn = (module: string, content: any) => log(LogType.Warn, module, content);
+export const info = (module: string, content: any) => log(LogType.Info, module, content);
+export const debug = (module: string, content: any) => log(LogType.Debug, module, content);

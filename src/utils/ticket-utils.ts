@@ -1,3 +1,4 @@
+import { logging } from '.';
 import { Ticket, TicketPhrase } from '../types';
 
 function friendlyPhrase(phrase: string): string {
@@ -30,7 +31,7 @@ export function shouldAlert(ticketPhrase: TicketPhrase, ticket: Ticket): { alert
         return { alert: false };
       }
     } catch (e) {
-      console.error(e);
+      logging.error('UTILS >> shouldAlert()', e);
 
       return { alert: false };
     }

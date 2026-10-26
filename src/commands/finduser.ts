@@ -1,6 +1,6 @@
 import { ApplicationIntegrationType, ChatInputCommandInteraction, Client, InteractionContextType, PermissionFlagsBits, SlashCommandBuilder } from 'discord.js';
 import { config } from '../config';
-import { deferInteraction, getDiscordAlts, getE621User } from '../utils';
+import { deferInteraction, getDiscordAlts, getE621User, logging } from '../utils';
 
 export default {
   name: 'finduser',
@@ -34,7 +34,7 @@ export default {
 
       interaction.editReply(`[${e621User.name}](${config.E621_BASE_URL}/users/${e621User.id})<${e621User.id}>'s e621 and discord account(s):\n${content}`);
     } catch (e) {
-      console.error(e);
+      logging.error('COMMANDS >> /finduser', e);
 
       interaction.editReply('I got lost in the net.');
     }
