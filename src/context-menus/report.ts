@@ -1,6 +1,7 @@
 import { ApplicationCommandType, ApplicationIntegrationType, Client, ContextMenuCommandBuilder, InteractionContextType, LabelBuilder, MessageContextMenuCommandInteraction, MessageFlags, ModalBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, TextInputBuilder, TextInputStyle } from 'discord.js';
 
 import { Database } from '../shared/Database';
+import { logging } from '../utils';
 
 export default {
   name: 'Report Message',
@@ -59,7 +60,7 @@ export default {
 
       await interaction.showModal(modal);
     } catch (error) {
-      console.error(error);
+      logging.error('CONTEXT_MENUS >> report', error);
       if (!interaction.replied) {
         await interaction.reply({
           content: 'Hmm, an error occurred while processing your request. If you receive this error more than once, DM a moderator for further assistance.',

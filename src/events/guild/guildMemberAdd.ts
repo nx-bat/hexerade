@@ -1,7 +1,7 @@
 import { Client, GuildMember, GuildTextBasedChannel } from 'discord.js';
 import { Database } from '../../shared/Database';
 import { Event } from '../../types';
-import { getE621Alts } from '../../utils';
+import { getE621Alts, logging } from '../../utils';
 
 class GuildMemberAddEvent implements Event<Client, 'guildMemberAdd'> {
   event = 'guildMemberAdd' as const;
@@ -14,7 +14,7 @@ class GuildMemberAddEvent implements Event<Client, 'guildMemberAdd'> {
     if (!channel) return;
 
     const content = `${member.toString()}'s (${member.id}) e621 and discord account(s):\n${await getE621Alts(member.id, member.guild)}`;
-    channel.send(content).catch(console.error);
+    channel.send(content).catch(error => logging.error('EVENTS >> guild', error);
 
     if (settings.moderator_channel_id && content.includes('[BANNED]')) {
       const modChannel = await member.guild.channels.fetch(settings.moderator_channel_id) as GuildTextBasedChannel;
