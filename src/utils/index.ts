@@ -16,6 +16,7 @@ export * from './event-utils';
 export * from './file-utils';
 export * from './github-user-utils';
 export * from './interaction-utils';
+export * as logging from './logging';
 export * from './message-matcher-regex';
 export * from './message-handler-utils';
 export * from './message-utils';
