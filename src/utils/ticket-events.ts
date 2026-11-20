@@ -74,47 +74,30 @@ function getTitle(ticket: Ticket): string {
   if (!ticket.target) return `${humanizeCapitalization(ticket.category)} report by ${ticket.user}`;
 
   switch (ticket.category) {
-    case 'blip':
-      return `Blip by ${ticket.target}`;
-    case 'comment':
-      return `Comment by ${ticket.target}`;
-    case 'dmail':
-      return `DMail sent by ${ticket.target}`;
-    case 'forum':
-      return `Forum post by ${ticket.target}`;
-    case 'pool':
-      return `Pool ${ticket.target}`;
-    case 'post':
-      return `Post uploaded by ${ticket.target}`;
-    case 'set':
-      return `Wow, a rare set report! ${ticket.target}`;
-    case 'user':
-      return `User ${ticket.target}`;
-    case 'wiki':
-      return `Wiki page ${ticket.target}`;
-    case 'replacement':
-      return `Replacement by ${ticket.target}`;
-    default:
-      return 'Unknown ticket category';
+    case 'blip': return `Blip by ${ticket.target}`;
+    case 'comment': return `Comment by ${ticket.target}`;
+    case 'dmail': return `DMail sent by ${ticket.target}`;
+    case 'forum': return `Forum post by ${ticket.target}`;
+    case 'pool': return `Pool ${ticket.target}`;
+    case 'post': return `Post uploaded by ${ticket.target}`;
+    case 'set': return `Wow, a rare set report! ${ticket.target}`;
+    case 'user': return `User ${ticket.target}`;
+    case 'wiki': return `Wiki page ${ticket.target}`;
+    case 'replacement': return `Replacement by ${ticket.target}`;
+    default: return 'Unknown ticket category';
   }
 }
 
-function getURL(ticket: Ticket): string {
-  return `${config.E621_BASE_URL}/tickets/${ticket.id}`;
-}
+const getURL = (ticket: Ticket): string => `${config.E621_BASE_URL}/tickets/${ticket.id}`;
 
 async function createEmbedFromTicket(ticket: Ticket): Promise<EmbedBuilder> {
   return new EmbedBuilder()
     .setTitle(getTitle(ticket))
-    .setURL(await getURL(ticket))
+    .setURL(getURL(ticket))
     .setAuthor(getAuthor(ticket))
     .setColor(getColor(ticket))
     .setFields(
-      {
-        name: 'Reason',
-        value: await parseMarkdownToField(ticket.reason),
-        inline: false
-      },
+      { name: 'Reason', value: await parseMarkdownToField(ticket.reason), inline: false },
       ...getFields(ticket)
     )
     .setFooter({ text: `Ticket #${ticket.id}` });
@@ -128,76 +111,96 @@ async function getButtons(ticket: Ticket): Promise<ActionRowBuilder<ButtonBuilde
 
   let skipPrimary = false;
 
-  if (ticket.category == 'blip') {
-    primaryButton
-      .setLabel('Open Blip')
-      .setURL(`${config.E621_BASE_URL}/blips/${ticket.target_id}`);
-  } else if (ticket.category == 'comment') {
-    primaryButton
-      .setLabel('Open Comment')
-      .setURL(`${config.E621_BASE_URL}/comments/${ticket.target_id}`);
-  } else if (ticket.category == 'dmail') {
-    primaryButton
-      .setLabel('Open DMail')
-      .setURL(`${config.E621_BASE_URL}/dmails/${ticket.target_id}`);
-  } else if (ticket.category == 'forum') {
-    primaryButton
-      .setLabel('Open Forum Post')
-      .setURL(`${config.E621_BASE_URL}/forum_posts/${ticket.target_id}`);
-  } else if (ticket.category == 'pool') {
-    primaryButton
-      .setLabel('Open Pool')
-      .setURL(`${config.E621_BASE_URL}/pools/${ticket.target_id}`);
-  } else if (ticket.category == 'post') {
-    const post = await getE621Post(ticket.target_id);
-
-    if (post && spoilerOrBlacklist(post).action == PostAction.Blacklist) skipPrimary = true;
-    else {
+  switch (ticket.category) {
+    case 'blip':
       primaryButton
-        .setLabel('Open Post')
-        .setURL(`${config.E621_BASE_URL}/posts/${ticket.target_id}`);
-    }
-  } else if (ticket.category == 'set') {
-    primaryButton
-      .setLabel('Open Set')
-      .setURL(`${config.E621_BASE_URL}/post_sets/${ticket.target_id}`);
-  } else if (ticket.category == 'user') {
-    primaryButton
-      .setLabel('Open User')
-      .setURL(`${config.E621_BASE_URL}/users/${ticket.target_id}`);
-  } else if (ticket.category == 'wiki') {
-    primaryButton
-      .setLabel('Open Wiki')
-      .setURL(`${config.E621_BASE_URL}/wikis/${ticket.target_id}`);
-  } else if (ticket.category == 'replacement') {
-    primaryButton
-      .setLabel('Open Replacement')
-      .setURL(`${config.E621_BASE_URL}/post_replacements?search[id]=${ticket.target_id}`);
-  } else {
-    console.error('Unknown ticket type:');
-    console.error(JSON.stringify(ticket, null, 2));
-    skipPrimary = true;
+        .setLabel('Open Blip')
+        .setURL(`${config.E621_BASE_URL}/blips/${ticket.target_id}`);
+      break;
+    case 'comment':
+      primaryButton
+        .setLabel('Open Comment')
+        .setURL(`${config.E621_BASE_URL}/comments/${ticket.target_id}`);
+      break;
+    case 'dmail':
+      primaryButton
+        .setLabel('Open DMail')
+        .setURL(`${config.E621_BASE_URL}/dmails/${ticket.target_id}`);
+      break;
+    case 'forum':
+      primaryButton
+        .setLabel('Open Forum Post')
+        .setURL(`${config.E621_BASE_URL}/forum_posts/${ticket.target_id}`);
+      break;
+    case 'pool':
+      primaryButton
+        .setLabel('Open Pool')
+        .setURL(`${config.E621_BASE_URL}/pools/${ticket.target_id}`);
+      break;
+    case 'post':
+      const post = await getE621Post(ticket.target_id);
+
+      if (post && spoilerOrBlacklist(post).action == PostAction.Blacklist) skipPrimary = true;
+      else {
+        primaryButton
+          .setLabel('Open Post')
+          .setURL(`${config.E621_BASE_URL}/posts/${ticket.target_id}`);
+      }
+      break;
+    case 'set':
+      primaryButton
+        .setLabel('Open Set')
+        .setURL(`${config.E621_BASE_URL}/post_sets/${ticket.target_id}`);
+      break;
+    case 'user':
+      primaryButton
+        .setLabel('Open User')
+        .setURL(`${config.E621_BASE_URL}/users/${ticket.target_id}`);
+      break;
+    case 'wiki':
+      primaryButton
+        .setLabel('Open Wiki')
+        .setURL(`${config.E621_BASE_URL}/wikis/${ticket.target_id}`);
+      break;
+    case 'replacement':
+      primaryButton
+        .setLabel('Open Replacement')
+        .setURL(`${config.E621_BASE_URL}/post_replacements?search[id]=${ticket.target_id}`);
+      break;
+
+    default:
+      skipPrimary = true;
+      break;
   }
 
   if (!skipPrimary) row.addComponents(primaryButton);
 
-  if (ticket.category == 'blip' || ticket.category == 'comment' || ticket.category == 'dmail' || ticket.category == 'forum') {
-    const button = new ButtonBuilder()
-      .setLabel('Open Target User')
-      .setStyle(ButtonStyle.Link)
-      .setURL(`${config.E621_BASE_URL}/users/${ticket.accused_id}`);
+  switch (ticket.category) {
+    case 'blip':
+    case 'comment':
+    case 'dmail':
+    case 'forum': {
+      const button = new ButtonBuilder()
+        .setLabel('Open Target User')
+        .setStyle(ButtonStyle.Link)
+        .setURL(`${config.E621_BASE_URL}/users/${ticket.accused_id}`);
 
-    row.addComponents(button);
-  } else if (ticket.category == 'post') {
-    const user = await getE621User(ticket.target!);
+      row.addComponents(button);
+      break;
+    }
 
-    if (user) {
+    case 'post': {
+      const user = await getE621User(ticket.target!);
+
+      if (!user) break;
+
       const button = new ButtonBuilder()
         .setLabel('Open Target User')
         .setStyle(ButtonStyle.Link)
         .setURL(`${config.E621_BASE_URL}/users/${user.id}`);
 
       row.addComponents(button);
+      break;
     }
   }
 
@@ -205,9 +208,8 @@ async function getButtons(ticket: Ticket): Promise<ActionRowBuilder<ButtonBuilde
 }
 
 async function sendTicketAlerts(ticket: Ticket, channel: SendableChannels) {
-  const guildSettings = await Database.getOrCreateSettings(config.DISCORD_GUILD_ID!);
-
-  if (!guildSettings || !guildSettings.admin_role_id) return;
+  const settings = await Database.getOrCreateSettings(config.DISCORD_GUILD_ID!);
+  if (!settings || !settings.admin_role_id) return;
 
   const usersToMention: string[] = [];
   const rolesToMention: string[] = [];
@@ -216,10 +218,10 @@ async function sendTicketAlerts(ticket: Ticket, channel: SendableChannels) {
   await Database.getAllTicketPhrases((ticketPhrase: TicketPhrase) => {
     const { alert, match } = shouldAlert(ticketPhrase, ticket);
     if (alert) {
-      const mention = ticketPhrase.user_id == 'admin' ? `<@&${guildSettings.admin_role_id!}>` : `<@${ticketPhrase.user_id}>`;
+      const mention = ticketPhrase.user_id == 'admin' ? `<@&${settings.admin_role_id!}>` : `<@${ticketPhrase.user_id}>`;
 
-      if (ticketPhrase.user_id == 'admin' && !rolesToMention.includes(guildSettings.admin_role_id!)) {
-        rolesToMention.push(guildSettings.admin_role_id!);
+      if (ticketPhrase.user_id == 'admin' && !rolesToMention.includes(settings.admin_role_id!)) {
+        rolesToMention.push(settings.admin_role_id!);
       } else if (!usersToMention.includes(ticketPhrase.user_id)) {
         usersToMention.push(ticketPhrase.user_id);
       }
